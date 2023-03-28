@@ -52,7 +52,7 @@ def send_message(bot, message):
 def get_api_answer(timestamp):
     """Запрос к эндпоинту API-сервиса."""
     payload = {'from_date': timestamp}
-    logging.debug(f'Началась проверка запроса к API: "{ENDPOINT}"'
+    logging.debug(f'Началась проверка запроса к API: "{ENDPOINT}" '
                   f'с параметрами {timestamp}')
     try:
         response = requests.get(ENDPOINT, headers=HEADERS, params=payload)
@@ -68,7 +68,7 @@ def get_api_answer(timestamp):
 
 def check_response(response):
     """Проверка ответа API на соответсвие документации."""
-    logging.debug(f'Началась проверка ответа API: "{ENDPOINT}"'
+    logging.debug(f'Началась проверка ответа API: "{ENDPOINT}" '
                   'на соответсвие документации')
     if not isinstance(response, dict):
         raise TypeError('Ответ не является словарем')
