@@ -114,7 +114,7 @@ def main():
                 send_message(bot, message)
             else:
                 logging.info('Статус домашней работы ещё не обновился')
-            errors.clear()
+            errors = ''
             timestamp = response.get('current_date')
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
