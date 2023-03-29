@@ -34,10 +34,9 @@ def check_tokens():
         non_token = ''
         if token is None:
             non_token += f'"{token}" '
-        if non_token != '':
-            logging.critical(f'Токены {non_token} не определены')
-            NameError(f'Токены {non_token} не определены')
-            sys.exit(0)
+    if non_token != '':
+        logging.critical(f'Токены {non_token} не определены')
+        raise NameError(f'Токены {non_token} не определены')
 
 
 def send_message(bot, message):
@@ -53,7 +52,7 @@ def get_api_answer(timestamp):
     """Запрос к эндпоинту API-сервиса."""
     payload = {'from_date': timestamp}
     logging.debug(f'Началась проверка запроса к API: "{ENDPOINT}" '
-                  f'с параметрами {timestamp}')
+                  f'с параметрами {payload}')
     try:
         response = requests.get(ENDPOINT, headers=HEADERS, params=payload)
         logging.debug(f'Запрос к API: "{ENDPOINT}" осуществлен успешно')
@@ -68,7 +67,7 @@ def get_api_answer(timestamp):
 
 def check_response(response):
     """Проверка ответа API на соответсвие документации."""
-    logging.debug(f'Началась проверка ответа API: "{ENDPOINT}" '
+    logging.debug(f'Началась проверка ответа API: "{response}" '
                   'на соответсвие документации')
     if not isinstance(response, dict):
         raise TypeError('Ответ не является словарем')
@@ -95,8 +94,7 @@ def parse_status(homework):
     if status not in HOMEWORK_VERDICTS:
         raise ValueError('Недокументированный статус')
     verdict = HOMEWORK_VERDICTS[status]
-    homework_name = homework['homework_name']
-    return (f'Изменился статус проверки работы "{homework_name}". {verdict}')
+    return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
 def main():
@@ -119,20 +117,20 @@ def main():
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.error(message, exc_info=True)
-            if message not in errors:
+            if message != errors:
                 bot.send_message(
                     chat_id=TELEGRAM_CHAT_ID,
                     text=message
                 )
-                errors += f'{message}, end = "\n"'
+                errors = message
         finally:
             time.sleep(RETRY_PERIOD)
 
 
 if __name__ == '__main__':
-    logging.StreamHandler(sys.stdout)
     logging.basicConfig(
         level=logging.DEBUG,
+        handlers=[logging.StreamHandler(sys.stdout)],
         format="%(asctime)s — %(name)s — %(levelname)s —"
         "%(message)s - %(funcName)s - %(lineno)d")
     main()
